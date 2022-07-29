@@ -130,12 +130,10 @@ To run the program you only need to run `plot.py`. Some arguments to keep in min
 ``` bash
 # considering that '~/Documents/dataset' was the dataset files
 # images should be saved on '~/Documents/plot_images'
-python3 plot.py ~/Documents/dataset ~/Documents -d plot_images
+python plot.py ~/Documents/dataset ~/Documents -d plot_images
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 <!-- LICENSE -->
 
@@ -145,18 +143,14 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* []()
-* []()
-* []()
+This work is funded by FCT/MEC through national funds under the project PTDC/
+EEI-TEL/30685/2017; and by FCT/MCTES through national funds and when applicable
+co-funded EU funds under the project UIDB/50008/2020-UIDP/50008/2020.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
@@ -170,7 +164,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 [issues-url]: https://github.com/immarianaas/home-comfort-dataset/issues
 [license-shield]: https://img.shields.io/github/license/immarianaas/home-comfort-dataset.svg?style=for-the-badge
 [license-url]: https://github.com/immarianaas/home-comfort-dataset/blob/master/LICENSE.txt
-
 
 
 [Python-logo]: https://img.shields.io/badge/Python-306998?style=for-the-badge&amp;logo=python&amp;logoColor=white
