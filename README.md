@@ -23,8 +23,6 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 
-
-
 <!-- PROJECT LOGO -->
 <br />
 
@@ -34,10 +32,7 @@
     Processing of the dataset gathered in the scope of the Smart Green Homes project.
   </p>
 
-
 </div>
-
-
 
 <!-- TABLE OF CONTENTS -->
 
@@ -68,8 +63,6 @@
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
 
 ## About The Project
@@ -77,8 +70,6 @@
 Processing of the dataset gathered during the execution of the Smart Green Homes project. This dataset comprises of envioronmental collected from volunteers' homes, which can be used for researching and developing techonogy solutions for households, with the goal of raising standards of comfort, safety and user satisfaction.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 ### Built With
 
@@ -88,8 +79,6 @@ Processing of the dataset gathered during the execution of the Smart Green Homes
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-
 <!-- GETTING STARTED -->
 
 ## Getting Started
@@ -98,7 +87,8 @@ To execute the script to generate the charts follow these simple steps.
 
 ### Prerequisites
 
-To run the script you need to have at least Python 3.8 installed on your machine. You can find out how [in the official page](https://www.python.org/downloads/).
+To run the script you need to have at least Python 3.8 installed on your machine.
+You can find out how [in the official page](https://www.python.org/downloads/).
 
 ### Installation
 
@@ -110,12 +100,12 @@ To run the script you need to have at least Python 3.8 installed on your machine
 2. Install Python packages
    ```sh
    cd home-comfort-dataset
-   python3 -m pip install -r requirements.txt
+   python3 -m venv venv
+   source venv/bin/activate
+   python -m pip install -r requirements.txt
    ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 <!-- USAGE EXAMPLES -->
 
