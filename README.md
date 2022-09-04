@@ -83,7 +83,7 @@ Processing of the dataset gathered during the execution of the Smart Green Homes
 
 ## Getting Started
 
-To execute the script to generate the charts follow these simple steps.
+The steps to execute both the script to generate the charts and the script to generate a report on the dataset format are explained below.
 
 ### Prerequisites
 
@@ -111,7 +111,9 @@ You can find out how [in the official page](https://www.python.org/downloads/).
 
 ## Usage
 
-To run the program you only need to run `plot.py`. Some arguments to keep in mind:
+There are two scripts you can run. 
+
+`plot.py` wll produce the charts regarding the information in the dataset. Some arguments to keep in mind:
 
 | Positional arguments | Descriptions |
 |---|---|
@@ -124,6 +126,12 @@ To run the program you only need to run `plot.py`. Some arguments to keep in min
 | `-d ADDITIONAL DIRECTORY` | directory that might not exist (it will be created in that case); <br />if set, they are to be saved on `<SAVE IMAGES PATH>/<ADDITIONAL DIRECTORY>` |
 | `--titles` | charts are to be saved with titles **(set by default)** |
 | `--no-titles` | charts are to be saved without titles |
+
+On the other hand, `data.py` displays information regarding the dataset structure and formats. It only requires the introduction of the dataset path:
+
+| Positional arguments | Descriptions                                         |
+| -------------------- | ---------------------------------------------------- |
+| `DATASET PATH`       | path to directory where the dataset files are placed |
 
 ### Example
 
