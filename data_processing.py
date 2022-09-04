@@ -4,10 +4,12 @@ import json
 import matplotlib.pyplot as plt 
 import os
 import locale
+import math
 
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from matplotlib.ticker import FormatStrFormatter
+
 from matplotlib import rcParams
 rcParams.update({'figure.autolayout': True})
 rcParams.update({'axes.titlesize': 15})
@@ -24,6 +26,9 @@ PURPLE = '#be78e3'
 SET_TITLES = True
 DAYS = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
 df = None
+
+# list with files to consider
+FILES = ['sgh0201a8c87da4.csv', 'sgh0201a17a7a16.csv', 'sgh0201b9b7d045.csv', 'sgh0201e9248493.csv', 'sgh0201f6cb55ed.csv', 'sgh02015d5c61cc.csv', 'sgh02018fe9be2c.csv', 'sgh02019d93db3f.csv', 'sgh020102d29c86.csv', 'sgh020114a6a800.csv', 'sgh020125bce03a.csv', 'sgh020149c615c5.csv', 'sgh020177a7a91d.csv']
 
 #######################
 # AUXILIARY FUNCTIONS #
@@ -57,16 +62,13 @@ def get_type(x):
 # READING FILES & SETUP #
 #########################
 
-def setup(datasetdir, title):
+def setup(datasetdir, title = True):
     global df, SET_TITLES
     SET_TITLES = title
 
-    # list with files to consider
-    files = ['sgh0201a8c87da4.csv', 'sgh0201a17a7a16.csv', 'sgh0201b9b7d045.csv', 'sgh0201e9248493.csv', 'sgh0201f6cb55ed.csv', 'sgh02015d5c61cc.csv', 'sgh02018fe9be2c.csv', 'sgh02019d93db3f.csv', 'sgh020102d29c86.csv', 'sgh020114a6a800.csv', 'sgh020125bce03a.csv', 'sgh020149c615c5.csv', 'sgh020177a7a91d.csv']
-
     # appending data from all files
     df_list = []
-    for fi in files:
+    for fi in FILES:
         file_path = os.path.join(datasetdir, fi)
         if not os.path.exists(file_path):
             raise FileNotFoundError("Path \'{0}\' does not contain the dataset files.".format(datasetdir))
@@ -629,3 +631,138 @@ def average_temperature_by_hour_week_with_occupancy(with_std=False):
     legend_elements += [ Patch(facecolor=BLUE, label='Standard Deviation Range', alpha=.15)]
     ax.legend( handles = legend_elements )
     return ax
+
+
+################################
+# PART 2 - AUXILIARY FUNCTIONS #
+################################
+
+# convert time difference to hours
+to_hours = lambda x : math.ceil( x.total_seconds()/(60*60) )
+
+# creates a dictionary with some metrics about the columns 
+# passed in the argument in the dataframe
+# is only applicable for columns with numeric values
+def create_dict_helper( dataframe, list_numeric_columns):
+    info = {}
+    without_nan = lambda x : x[ ~np.isnan( x ) ]
+
+    # populate 'info' dictionary with the following information regarding each column:
+    # - does it have any null value
+    # - the minimum value
+    # - the maximum value
+    # - the type (either 'int' or 'float')
+    for col in list_numeric_columns:
+        values = dataframe[col].unique()
+        values_wo_nan = without_nan(values)
+        info[col] = {
+            'has null': np.isnan( values ).any(),
+            'min value': values_wo_nan.min(),
+            'max value': values_wo_nan.max(),
+            'type': 'float' if any( [elem%1 != 0 for elem in values_wo_nan] ) else 'int'
+        }
+    return info
+
+################################################################
+#                  DATA RECORDS INFORMATION                    #
+################################################################
+# - general_information_by_tenant                              #
+# - information_state_message                                  #
+# - information_feedback_message                               #
+# - information_temp_humid_press_message                       #
+# - information_door_message                                   #
+# - information_movement_message                               #
+# - information_meteorology_message                            #
+################################################################
+
+def general_information_by_tenant():
+    dfr = df.reset_index()
+    df_grouped = dfr.groupby(['tenant']).agg(['first', 'last', 'count'])['date']
+
+    # count the number of hours where there is at least one entry, per tenant
+    number_hours_with_entries = df.groupby('tenant').resample('h').count()['tenant'].groupby('tenant').apply( lambda x : np.count_nonzero(x))
+
+    # count the number of hours between the first entry and the last, per tenant
+    df_grouped['difference (h)'] = (df_grouped['last'] - df_grouped['first']).apply( to_hours )
+    
+    #compute the ratio between the number of hours with at least one entry and the total number of hours for each tenant
+    df_grouped['percentage hours'] = number_hours_with_entries/df_grouped['difference (h)']
+
+    results = []
+    for index, row in df_grouped.iterrows():
+        # for each tenant, save:
+        # - the tenant id
+        # - the start and end date
+        # - rate of the hours with at least one log (as explained above)
+        results.append( {
+            'tenant': index.split('.')[0][3:],
+            'start date': row['first'].strftime('%d-%m-%Y'), 
+            'end date': row['last'].strftime('%d-%m-%Y'),
+            'rate hours with at least one log': row['percentage hours']*100
+            } )
+    return results
+
+def information_state_message():
+    # find possible values of 'state' per each value of 'device'
+    unique_states_by_device = df[is_state].groupby('device')['state'].unique()
+
+    # join all possible values of 'state' for when 'device' is a tenant id
+    tenant_states =  set( elem for l in [ list( unique_states_by_device[device] ) for device in unique_states_by_device.index if 'sgh'+ device.lower() +'.csv' in FILES ] for elem in l )
+
+    # return possible state values associated with the device
+    return {
+        'feedback': set( unique_states_by_device['feedback'] ),
+        'status': set( unique_states_by_device['status'] ),
+        '<tenant>': tenant_states
+    }
+
+def information_feedback_message():
+    # return possible 'feedback' values; 'device' is always 'feedback'
+    return {
+        df[is_feedback]['device'].unique()[0]: set( df[is_feedback]['feedback'].unique() )
+        }
+
+def information_temp_humid_press_message():
+    # return dictionary returned by the helper function as explained above
+    return create_dict_helper( df[is_various], ['temperature', 'linkquality', 'humidity', 'pressure'])
+
+
+def information_door_message():
+    # use helper function to create dictionary
+    info = create_dict_helper( df[is_door], ['linkquality', 'battery', 'voltage'])
+
+    # add information regarding 'contact' since the column does not have numeric values
+    info['contact'] = {
+        'type': 'bool',
+        'has null': False
+    }
+    return info
+
+
+def information_movement_message():
+    # use helper function to create dictionary
+    info = create_dict_helper( df[is_movement], ['illuminance', 'linkquality', 'battery', 'voltage'])
+
+    # add information regarding 'occupancy' since the column does not have numeric values
+    info['occupancy'] = {
+        'type': 'bool',
+        'has null': True
+    }
+
+    return info
+
+def information_meteorology_message():
+    # use helper function to create dictionary
+    info = create_dict_helper( df[is_meteo], ['precipitation', 'windspeed', 'pressure', 'humidity', 'temperature'])
+    
+    # add information regarding 'description' and 'winddirection'
+    #  since these columns do not have numeric values
+    info['description'] = {
+            'type': 'string',
+            'has null': False
+        }
+    info['winddirection'] = {
+            'type': 'string',
+            'has null': True
+        }
+    return info
