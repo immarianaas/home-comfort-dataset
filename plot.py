@@ -176,6 +176,32 @@ def main():
 
     clearPlt()
 
+    #####################
+    #  CREATE CHARTS 2  #
+    #####################
+
+    ax = correlation_temperature()
+    ax.get_figure().savefig(
+        os.path.join(save_to_path, 'correlation-temperature.pdf'),
+        format='pdf'
+    )
+
+    clearPlt()
+
+    ax = correlation_humidity()
+    ax.get_figure().savefig(
+        os.path.join(save_to_path, 'correlation-humidity.pdf'),
+        format='pdf'
+    )
+        
+    clearPlt()
+
+    ax = correlation_occupancy()
+    ax.get_figure().savefig(
+        os.path.join(save_to_path, 'correlation-occupancy.pdf'),
+        format='pdf'
+    )
+
 
 if __name__ == "__main__":
     main()
