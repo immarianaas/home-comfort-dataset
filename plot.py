@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
-import argparse, os
+import argparse
+import os
 from data_processing import *
+
 
 def dir_path(path):
     if os.path.isdir(path):
@@ -8,24 +10,26 @@ def dir_path(path):
     else:
         raise argparse.ArgumentTypeError(f"\'{path}\' is not a valid path")
 
+
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='Process command line arguments.')
-    parser.add_argument( 
-        'dataset_path', 
-        metavar='DATASET PATH', 
-        help='path to where the dataset files are', 
+    parser = argparse.ArgumentParser(
+        description='Process command line arguments.')
+    parser.add_argument(
+        'dataset_path',
+        metavar='DATASET PATH',
+        help='path to where the dataset files are',
         type=dir_path
     )
-    parser.add_argument( 
-        'save_images_path', 
-        metavar='SAVE IMAGES PATH', 
-        help='existing path where the images will be saved (if \'ADDITIONAL DIRECTORY\' is not defined)', 
+    parser.add_argument(
+        'save_images_path',
+        metavar='SAVE IMAGES PATH',
+        help='existing path where the images will be saved (if \'ADDITIONAL DIRECTORY\' is not defined)',
         type=dir_path
     )
-    parser.add_argument( 
+    parser.add_argument(
         '-d', '--additional_directory',
-        metavar='ADDITIONAL DIRECTORY', 
-        help='directory to be used/created inside \'SAVE IMAGES PATH\' where the images will be saved', 
+        metavar='ADDITIONAL DIRECTORY',
+        help='directory to be used/created inside \'SAVE IMAGES PATH\' where the images will be saved',
         type=str
     )
     parser.add_argument(
@@ -36,11 +40,12 @@ def parse_arguments():
     parser.add_argument(
         '--no-titles',
         action='store_false',
-        dest= 'titles',
+        dest='titles',
         help='create charts without titles'
     )
     parser.set_defaults(titles=True)
     return parser.parse_args()
+
 
 def clearPlt():
     plt.cla()
@@ -50,11 +55,12 @@ def clearPlt():
 def main():
     args = parse_arguments()
 
-    save_to_path = os.path.join(args.save_images_path, args.additional_directory) if args.additional_directory else args.save_images_path
+    save_to_path = os.path.join(
+        args.save_images_path, args.additional_directory) if args.additional_directory else args.save_images_path
     if not os.path.exists(save_to_path):
         os.makedirs(save_to_path)
-    
-    setup( args.dataset_path, args.titles )
+
+    setup(args.dataset_path, args.titles)
 
     ax = relative_amount_data_by_month()
     ax.get_figure().savefig(
@@ -130,7 +136,8 @@ def main():
 
     ax = average_temperature_by_hour_with_occupancy(with_std=False)
     ax.get_figure().savefig(
-        os.path.join(save_to_path, 'average-temperature-by-hour-with-occupancy.pdf'),
+        os.path.join(
+            save_to_path, 'average-temperature-by-hour-with-occupancy.pdf'),
         format='pdf'
     )
 
@@ -138,7 +145,8 @@ def main():
 
     ax = average_temperature_by_hour_with_occupancy(with_std=True)
     ax.get_figure().savefig(
-        os.path.join(save_to_path, 'average-temperature-by-hour-with-occupancy-std.pdf'),
+        os.path.join(
+            save_to_path, 'average-temperature-by-hour-with-occupancy-std.pdf'),
         format='pdf'
     )
 
@@ -162,7 +170,8 @@ def main():
 
     ax = average_temperature_by_hour_week_with_occupancy(with_std=False)
     ax.get_figure().savefig(
-        os.path.join(save_to_path, 'average-temperature-by-hour-week-with-occupancy.pdf'),
+        os.path.join(
+            save_to_path, 'average-temperature-by-hour-week-with-occupancy.pdf'),
         format='pdf'
     )
 
@@ -170,7 +179,8 @@ def main():
 
     ax = average_temperature_by_hour_week_with_occupancy(with_std=True)
     ax.get_figure().savefig(
-        os.path.join(save_to_path, 'average-temperature-by-hour-week-with-occupancy-std.pdf'),
+        os.path.join(
+            save_to_path, 'average-temperature-by-hour-week-with-occupancy-std.pdf'),
         format='pdf'
     )
 
@@ -193,7 +203,15 @@ def main():
         os.path.join(save_to_path, 'correlation-humidity.pdf'),
         format='pdf'
     )
-        
+
+    clearPlt()
+
+    ax = correlation_pressure()
+    ax.get_figure().savefig(
+        os.path.join(save_to_path, 'correlation-pressure.pdf'),
+        format='pdf'
+    )
+
     clearPlt()
 
     ax = correlation_occupancy()

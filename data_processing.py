@@ -44,7 +44,8 @@ FILES = ['sgh0201a8c87da4.csv', 'sgh0201a17a7a16.csv', 'sgh0201b9b7d045.csv', 's
 
 
 def is_state(x): return pd.notna(x['state'])
-def is_various(x): return pd.notna(x['temperature']) & pd.isna(x['description'])
+def is_various(x): return pd.notna(
+    x['temperature']) & pd.isna(x['description'])
 
 
 def is_door(x): return pd.notna(x['contact'])
@@ -685,14 +686,19 @@ def average_temperature_by_hour_week_with_occupancy(with_std=False):
 ################################################################
 # - correlation_temperature                                    #
 # - correlation humidity                                       #
+# - correlation_pressure                                       #
 # - correlation_occupancy                                      #
 ################################################################
 
 
 def correlation_temperature():
-    temp_humid_week_tenant = df[is_various].groupby('tenant').resample('d', label='left')[['temperature']].mean().reset_index()
-    temp_week_tenant = temp_humid_week_tenant.pivot(index='date', columns='tenant', values='temperature')
-    temperature_corr = temp_week_tenant.corr()
+    temp_tenant_day = df[is_various].groupby('tenant').resample(
+        'd', label='left')[['temperature']].mean().reset_index()
+
+    temp_tenant_day = temp_tenant_day.pivot(
+        index='date', columns='tenant', values='temperature')
+
+    temperature_corr = temp_tenant_day.corr()
 
     plt.title(
         'Correlation Between the Temperature Values of Different Tenants' if SET_TITLES else '',
@@ -710,9 +716,13 @@ def correlation_temperature():
 
 
 def correlation_humidity():
-    temp_humid_week_tenant = df[is_various].groupby('tenant').resample('d', label='left')[['humidity']].mean().reset_index()
-    humid_week_tenant = temp_humid_week_tenant.pivot(index='date', columns='tenant', values='humidity')
-    humidity_corr = humid_week_tenant.corr()
+    humid_tenant_day = df[is_various].groupby('tenant').resample(
+        'd', label='left')[['humidity']].mean().reset_index()
+
+    humid_tenant_day = humid_tenant_day.pivot(
+        index='date', columns='tenant', values='humidity')
+
+    humidity_corr = humid_tenant_day.corr()
 
     plt.title(
         'Correlation Between the Humidity Values of Different Tenants' if SET_TITLES else '',
@@ -720,6 +730,30 @@ def correlation_humidity():
     )
     ax = sns.heatmap(
         humidity_corr,
+        annot=False,
+        yticklabels=False,
+        xticklabels=False,
+        linewidths=.8,
+        cmap="YlGnBu"
+    )
+    return ax
+
+
+def correlation_pressure():
+    pressure_tenant_day = df[is_various].groupby('tenant').resample(
+        'd', label='left')[['pressure']].mean().reset_index()
+
+    pressure_tenant_day = pressure_tenant_day.pivot(
+        index='date', columns='tenant', values='pressure')
+
+    temperature_corr = pressure_tenant_day.corr()
+
+    plt.title(
+        'Correlation Between the Pressure Values of Different Tenants' if SET_TITLES else '',
+        fontdict={'fontsize': 10}
+    )
+    ax = sns.heatmap(
+        temperature_corr,
         annot=False,
         yticklabels=False,
         xticklabels=False,
@@ -741,7 +775,8 @@ def correlation_occupancy():
 
     norm_people_home_per_hour = people_home_per_hour/people_home_per_hour.sum()
 
-    dist = additive_chi2_kernel(norm_people_home_per_hour, norm_people_home_per_hour)
+    dist = additive_chi2_kernel(
+        norm_people_home_per_hour, norm_people_home_per_hour)
     plt.title(
         'Correlation Between the Occupancy Values of Different Tenants' if SET_TITLES else '',
         fontdict={'fontsize': 10}
@@ -761,11 +796,15 @@ def correlation_occupancy():
 ################################
 
 # convert time difference to hours
+
+
 def to_hours(x): return math.ceil(x.total_seconds()/(60*60))
 
 # creates a dictionary with some metrics about the columns
 # passed in the argument in the dataframe
 # is only applicable for columns with numeric values
+
+
 def create_dict_helper(dataframe, list_numeric_columns):
     info = {}
     def without_nan(x): return x[~np.isnan(x)]
