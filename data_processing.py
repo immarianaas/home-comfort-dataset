@@ -44,8 +44,7 @@ FILES = ['sgh0201a8c87da4.csv', 'sgh0201a17a7a16.csv', 'sgh0201b9b7d045.csv', 's
 
 
 def is_state(x): return pd.notna(x['state'])
-def is_various(x): return pd.notna(
-    x['temperature']) & pd.isna(x['description'])
+def is_various(x): return pd.notna(x['temperature']) & pd.isna(x['description'])
 
 
 def is_door(x): return pd.notna(x['contact'])
@@ -691,12 +690,8 @@ def average_temperature_by_hour_week_with_occupancy(with_std=False):
 
 
 def correlation_temperature():
-    temp_humid_week_tenant = df[is_various].groupby('tenant').resample(
-        'd', label='left')[['temperature']].mean().reset_index()
-
-    temp_week_tenant = temp_humid_week_tenant.pivot(
-        index='date', columns='tenant', values='temperature')
-
+    temp_humid_week_tenant = df[is_various].groupby('tenant').resample('d', label='left')[['temperature']].mean().reset_index()
+    temp_week_tenant = temp_humid_week_tenant.pivot(index='date', columns='tenant', values='temperature')
     temperature_corr = temp_week_tenant.corr()
 
     plt.title(
@@ -715,12 +710,8 @@ def correlation_temperature():
 
 
 def correlation_humidity():
-    temp_humid_week_tenant = df[is_various].groupby('tenant').resample(
-        'd', label='left')[['humidity']].mean().reset_index()
-
-    humid_week_tenant = temp_humid_week_tenant.pivot(
-        index='date', columns='tenant', values='humidity')
-
+    temp_humid_week_tenant = df[is_various].groupby('tenant').resample('d', label='left')[['humidity']].mean().reset_index()
+    humid_week_tenant = temp_humid_week_tenant.pivot(index='date', columns='tenant', values='humidity')
     humidity_corr = humid_week_tenant.corr()
 
     plt.title(
